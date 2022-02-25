@@ -1,0 +1,130 @@
+let data = [
+    {
+        id: "101",
+        price: "150",
+        src: "images/football.png"
+    },
+    {
+        id: "102",
+        price: "120",
+        src: "images/tennis.png"
+    },
+    {
+        id: "103",
+        price: "90",
+        src: "images/basketball.png"
+    },
+    {
+        id: "104",
+        price: "110",
+        src: "images/table-tennis.png"
+    },
+    {
+        id: "105",
+        price: "80",
+        src: "images/soccer.png"
+    }
+]
+
+
+$(document).ready(function () {
+
+    console.log("hello");
+    displayProduct();
+
+    $("#products").on("click", ".add-to-cart", function (e) {
+        e.preventDefault();
+
+        let pid = $(this).data('pid');
+        let price = $(this).data('price');
+        let pri = $(this).data('pri');
+        let image = $(this).data('image');
+        quantity=1
+        console.log("add click")
+        $.ajax({
+            method: "POST",
+            url: "config.php",
+            data: { id: pid, price: price, quantity:quantity,image:image ,action:'add'},
+            // dataType: "JSON"
+        }).done(function (data) {
+            data=JSON.parse(data);
+            console.log(data);
+            disply(data);
+        });
+
+    })
+
+    $("#table").on("click", ".deletebtn", function (e) {
+        e.preventDefault();
+        let pid = $(this).data('pid');
+        console.log("add click")
+        $.ajax({
+            method: "POST",
+            url: "config.php",
+            data: { id: pid, action: "delete" },
+            //  dataType: "JSON"
+        }).done(function (data) {
+            console.log(data)
+            let newdata = JSON.parse(data);
+            disply(newdata);
+
+        });
+
+
+    })
+    $("#table").on("click", ".editbtn", function (e) {
+        console.log('edit')
+        e.preventDefault();
+        let pid = $(this).data('pid');
+        action = 'edit';
+        $.ajax({
+            url:'config.php',
+            method: 'POST',
+            data:{id:pid,action:action}
+        }).done(function(data){
+            let dataa = JSON.parse(data);
+            disply(dataa); 
+        })
+
+    })
+
+    function disply(data) {
+        let html = "<table style='margin-left:3%'><tr><th style='margin-left:3%'>product id</th><th>product price</th><th>Quantity</th><th>Action</th></tr>";
+        for (let i = 0; i < data.length; i++) {
+            html += "<tr style='margin-left:3%'><td> "
+                + data[i].id +
+                "</td><td>"
+                + data[i].price +
+                "</td><td>"
+                + data[i].qnty +
+                "</td><td>" +
+                "<a href=" + " # class=editbtn  data-pid=" + data[i].id + ">  edit</a><a href=" + " # class=deletebtn  data-pid=" + data[i].id + ">  delete</a>"
+            "</td></tr>"
+
+        }
+        $("#table").html(html + "</table>");
+    }
+
+
+    function displayProduct() {
+
+        let str = "";
+        for (let i = 0; i < data.length; i++) {
+            let obj = data[i];
+    
+            str += "<div id=product-101 class=product>\
+            <img src="+ obj.src + ">\
+            <h3 class=title><a href=#>Product"+ obj.id + "</a></h3>\
+            <span>Price: $"+ obj.price + "</span>\
+            <a class=add-to-cart href=# data-pid="+ obj.id + " " + "data-price=" + obj.price + ">Add To Cart</a>\
+        </div>"
+    
+        }
+        $("#products").html(str);
+    
+    
+    
+    }
+
+
+})
